@@ -25,7 +25,7 @@ pipeline {
 
         stage('Lint') {
             steps {
-                sh 'flake8 requests'
+                sh 'flake8 src/requests'
             }
         }
 
