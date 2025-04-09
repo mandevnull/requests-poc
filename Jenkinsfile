@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.11'
-            args '-u root' // si necesitas permisos para instalar cosas
+            image "python:3.11"
+            args "-u root" // si necesitas permisos para instalar cosas
         }
     }
 
