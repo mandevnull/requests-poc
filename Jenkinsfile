@@ -6,11 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Clonar repositorio') {
-            steps {
-                git 'https://github.com/psf/requests.git'
-            }
-        }
 
         stage('Crear entorno virtual') {
             steps {
