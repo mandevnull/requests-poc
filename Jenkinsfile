@@ -1,48 +1,52 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.11'
+            args '-u root' // si necesitas permisos para instalar cosas
+        }
+    }
 
     environment {
-        VENV_DIR = 'venv'
+        PIP_DISABLE_PIP_VERSION_CHECK = 1
+        PYTHONDONTWRITEBYTECODE = 1
+        PIP_NO_CACHE_DIR = off
     }
 
     stages {
-
-        stage('Crear entorno virtual') {
-            steps {
-                sh 'python3 -m venv $VENV_DIR'
-                sh '. $VENV_DIR/bin/activate && pip install --upgrade pip'
-            }
-        }
-
         stage('Instalar dependencias') {
             steps {
-                sh '. $VENV_DIR/bin/activate && pip install -r requirements.txt || true'
-                sh '. $VENV_DIR/bin/activate && pip install -e .[socks] pytest pytest-cov flake8'
+                sh '''
+                    pip install --upgrade pip
+                    pip install -r requirements.txt || true
+                    pip install -e .[socks] pytest pytest-cov flake8
+                '''
             }
         }
 
-        stage('Lint y análisis de calidad') {
+        stage('Lint') {
             steps {
-                sh '. $VENV_DIR/bin/activate && flake8 requests'
+                sh 'flake8 requests'
             }
         }
 
-        stage('Tests con cobertura') {
+        stage('Tests') {
             steps {
-                sh '. $VENV_DIR/bin/activate && pytest --cov=requests tests/'
+                sh 'pytest --cov=requests tests/'
             }
         }
 
-        stage('Empaquetado simulado') {
+        stage('Empaquetado') {
             steps {
                 sh 'tar czf requests_package.tar.gz requests'
             }
         }
 
-        stage('Despliegue simulado') {
+        stage('Simular despliegue') {
             steps {
-                sh 'mkdir -p staging'
-                sh 'cp requests_package.tar.gz staging/'
+                sh '''
+                    mkdir -p staging
+                    cp requests_package.tar.gz staging/
+                '''
             }
         }
     }
@@ -53,3 +57,4 @@ pipeline {
         }
     }
 }
+
